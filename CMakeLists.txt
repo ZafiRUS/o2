@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0.0)
 
-if(POLICY CMP0048) # in CMake >= 3.0.0
-    cmake_policy(SET CMP0048 OLD) # keep project() from clearing VERSION variables
-endif(POLICY CMP0048)
+#if(POLICY CMP0048) # in CMake >= 3.0.0
+#    cmake_policy(SET CMP0048 OLD) # keep project() from clearing VERSION variables
+#endif(POLICY CMP0048)
 
 set( CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules )
 
@@ -13,10 +13,12 @@ set(API_VER_PATCH "0")
 set(CPACK_PACKAGE_VERSION_MAJOR ${VER_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VER_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${VER_PATCH})
-set(PROJECT_VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_PATCH})
+#set(PROJECT_VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_PATCH})
 set(API_VERSION ${VER_MAJOR}.${VER_MINOR}.${API_VER_PATCH})
 
-project(o2)
+project(o2 VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_PATCH})
+
+include(GNUInstallDirs)
 
 option(o2_WITH_QT5 "Use Qt5" ON)
 
@@ -100,3 +102,21 @@ add_subdirectory(src)
 if(o2_BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif(o2_BUILD_EXAMPLES)
+
+
+install(
+  EXPORT o2Targets
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/o2
+  NAMESPACE o2::
+)
+
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(o2Config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/o2Config.cmake
+                              INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/o2/cmake)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/o2ConfigVersion.cmake
+                                 VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}
+                                 COMPATIBILITY SameMajorVersion )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/o2Config.cmake ${CMAKE_CURRENT_BINARY_DIR}/o2ConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/o2 )
+
